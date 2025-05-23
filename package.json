@@ -1,6 +1,7 @@
 {
   "name": "meteor-app",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "start": "meteor run",
     "test": "meteor test --once --driver-package meteortesting:mocha",
