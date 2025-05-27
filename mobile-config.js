@@ -27,7 +27,7 @@ App.info({
   App.accessRule('android.permission.RECORD_AUDIO');     // Required for video audio
   
   // Core app preferences
-  App.setPreference('Orientation', 'default');          // Allow both portrait and landscape
+  App.setPreference('Orientation', 'portrait');          // Force portrait orientation only
   App.setPreference('SwiftVersion', '5.0');            // Use latest Swift version
   App.setPreference('deployment-target', '13.0');       // Minimum iOS version
   App.setPreference('WKWebViewOnly', 'true');          // Use modern WebView only
@@ -37,6 +37,9 @@ App.info({
     THREAD_SAFE: true,                    // Enable thread safety
     USE_MAIN_THREAD: true,                // Run UI operations on main thread
     BACKGROUND_COLOR: '#000000',          // Black background for camera view
-    ENABLE_HIGH_RESOLUTION: true          // Use highest available resolution
+    ENABLE_HIGH_RESOLUTION: true,          // Use highest available resolution
+    FORCE_PORTRAIT: true,
+    CAMERA_PREVIEW_ALPHA: 1,
+    PREVIEW_SIZE_MODE: 'FILL'
   }); 
   
