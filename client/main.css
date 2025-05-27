@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
-body {
-  background-color: #000;
+html, body {
+  background-color: transparent !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* When camera is active */
+.camera-active {
+  background-color: transparent !important;
 }   
