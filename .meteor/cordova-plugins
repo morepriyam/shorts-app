@@ -1,2 +1,1 @@
-cordova-plugin-camera-preview@0.13.0
-cordova-plugin-media-capture@6.0.0
+cordova-plugin-camera-preview@https://github.com/morepriyam/cordova-plugin-camera-preview.git#e1b932cf8ee869c55fcb5ee779343f96418d6d3c
