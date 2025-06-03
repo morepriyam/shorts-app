@@ -6,6 +6,9 @@ declare global {
       startCamera: (options: any) => Promise<void>;
       stopCamera: () => Promise<void>;
       switchCamera: () => Promise<void>;
+      startRecordVideo: (options: any) => Promise<void>;
+      stopRecordVideo: () => Promise<string>;
+      takePicture: (options: any) => Promise<string>;
       CAMERA_DIRECTION: {
         BACK: string;
         FRONT: string;
@@ -17,7 +20,11 @@ declare global {
 export const CameraPreview = () => {
   const [isCameraStarted, setIsCameraStarted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [activeCamera, setActiveCamera] = useState<"BACK" | "FRONT">("BACK");
+  const [recordedVideoPath, setRecordedVideoPath] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     startCamera();
@@ -83,12 +90,102 @@ export const CameraPreview = () => {
     }
   };
 
+  const startRecording = async () => {
+    if (isLoading || isRecording) return;
+
+    try {
+      setIsLoading(true);
+      const dimensions = calculateDimensions();
+      const options = {
+        ...dimensions,
+        camera: window.CameraPreview.CAMERA_DIRECTION[activeCamera],
+        quality: 60,
+        withFlash: false,
+      };
+
+      await window.CameraPreview.startRecordVideo(options);
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Failed to start recording:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const stopRecording = async () => {
+    if (!isRecording) return;
+
+    try {
+      setIsLoading(true);
+      const videoPath = await window.CameraPreview.stopRecordVideo();
+      setRecordedVideoPath(videoPath);
+      setIsRecording(false);
+    } catch (error) {
+      console.error("Failed to stop recording:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const takePicture = async () => {
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+      const dimensions = calculateDimensions();
+      const picturePath = await window.CameraPreview.takePicture({
+        width: dimensions.width,
+        height: dimensions.height,
+        quality: 85,
+      });
+      console.log("Picture taken:", picturePath);
+    } catch (error) {
+      console.error("Failed to take picture:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-1 bg-transparent">
-      <div className="absolute inset-x-0 bottom-20 flex items-center justify-center">
+      <div className="absolute inset-x-0 bottom-20 flex items-center justify-center space-x-8">
+        <button
+          onClick={takePicture}
+          disabled={isLoading || isRecording}
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-white/30"
+        >
+          <svg
+            width="32"
+            height="32"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="4" />
+          </svg>
+        </button>
+
+        <button
+          onClick={isRecording ? stopRecording : startRecording}
+          disabled={isLoading}
+          className={`flex h-20 w-20 items-center justify-center rounded-full ${
+            isRecording ? "bg-red-500" : "bg-white/30"
+          }`}
+        >
+          {isRecording ? (
+            <div className="h-8 w-8 rounded-sm bg-white" />
+          ) : (
+            <div className="h-12 w-12 rounded-full border-4 border-white" />
+          )}
+        </button>
+
         <button
           onClick={switchCamera}
-          disabled={isLoading}
+          disabled={isLoading || isRecording}
           className="flex h-16 w-16 items-center justify-center rounded-full bg-white/30"
         >
           <svg
@@ -105,6 +202,14 @@ export const CameraPreview = () => {
           </svg>
         </button>
       </div>
+
+      {recordedVideoPath && (
+        <div className="absolute inset-x-0 top-4 flex justify-center">
+          <div className="rounded-lg bg-black/50 px-4 py-2 text-white">
+            Video saved: {recordedVideoPath}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
